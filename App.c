@@ -60,6 +60,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	//todo: adding velocity per second. cuz it makes more sense. 
 	//meter / sec 
 	
+	Vector2 acceleration = { .x = 0.0f, .y = 0.098f };
+	particle->acceleration = acceleration;
 	Vector2 added_pos = Vec2_Scale(particle.velocity, delta_time);
 	particle.position = Vec2_Add(particle.position, added_pos);
 
@@ -70,15 +72,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
 
-	const SDL_FRect rect = { .x = particle.position.x, .y = particle.position.y, .w = particle_size, .h = particle_size };
-
 	SDL_SetRenderDrawColor(renderer,0x00,0xFF,0x00,SDL_ALPHA_OPAQUE);
-
 	//draw circle with render lines
 	{
 		int cx = particle.position.x;
 		int cy = particle.position.y;
-		float radius = 15.0f;
+		const float radius = PARTICLE_RADIUS;
 		for (int dy = -radius; dy <= radius; ++dy) {
 			int dx = (int)(SDL_sqrtf(radius * radius - dy * dy));
 			int x1 = cx - dx;
