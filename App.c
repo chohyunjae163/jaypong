@@ -9,13 +9,18 @@
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 
+static const int WINDOW_SIZE = 640;
+
+static const double FPS = 120.0;
 static const double MILLISECS_PER_FRAME = 1/120 * 1000;
-static Uint64 prev_ticks = 0;
 static const float particle_size = 50.0f;
+
+static Uint64 prev_ticks = 0;
+static const Uint64 PIXELS_PER_METER = 50;
 
 Particle particle = { 
 	.position = { .x = 250, .y = 120 }, 
-	.velocity = { .x = 50, .y = 0 } 
+	.velocity = { .x = 0, .y = 0 } 
 };
 
 /* This function runs once at startup. */
@@ -28,7 +33,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_CreateWindowAndRenderer("examples/renderer/clear", 640, 480, 0, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("examples/renderer/clear", WINDOW_SIZE, WINDOW_SIZE, 0, &window, &renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
@@ -60,12 +65,18 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	//todo: adding velocity per second. cuz it makes more sense. 
 	//meter / sec 
 	
-	Vector2 acceleration = { .x = 0.0f, .y = 0.098f };
-	particle->acceleration = acceleration;
-	Vector2 added_pos = Vec2_Scale(particle.velocity, delta_time);
-	particle.position = Vec2_Add(particle.position, added_pos);
+	Vector2 acceleration = { .x = 0.0f, .y = 9.8f * PIXELS_PER_METER};
+	Vector2 accel_delta = Vec2_Scale(acceleration, delta_time);
+	
+	//integrate the acceleration and the velocity to find the new position
+	particle.velocity = Vec2_Add(particle.velocity, accel_delta);
+	Vector2 velocity_delta = Vec2_Scale(particle.velocity, delta_time);
+	particle.position = Vec2_Add(particle.position, velocity_delta);
 
+	//check the particle position, and keep the particle inside the boundaries of the window
+	//
 
+	//update prev_ticks
 	prev_ticks = current_ticks; 
 
 	/* clear the window to the draw color. */
