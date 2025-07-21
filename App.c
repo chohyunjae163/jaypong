@@ -19,6 +19,10 @@ static Uint64 prev_ticks = 0;
 static const Uint64 PIXELS_PER_METER = 50;
 static const float GRAVITY = 9.8;
 static Vector2 input_force = { .x = 0, .y = 0 };
+
+//todo: create a fluid
+static SDL_FRect liquid;
+
 #define NUM_PARTICLE 10
 
 Particle particles[NUM_PARTICLE];
@@ -41,6 +45,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 		particles[0].position.x = 250.0;
 		particles[0].position.y = 50.0;
 		particles[0].mass = 1.0f;
+
+		liquid.x = 0;
+		liquid.y = WINDOW_SIZE / 2;
+		liquid.w = WINDOW_SIZE;
+		liquid.h = WINDOW_SIZE / 2;
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
@@ -98,8 +107,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	Particle_Integrate(&particles[0], force, delta_time);
 
 
+	//TODO:
 	//check the particle position, and keep the particle inside the boundaries of the window
-	//
+	
 
 	//update prev_ticks
 	prev_ticks = current_ticks; 
@@ -108,6 +118,11 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
 
+	//draw liquid
+	SDL_SetRenderDrawColor(renderer,0x00,0x00,0xFF,SDL_ALPHA_OPAQUE);
+	SDL_RenderFillRect(renderer,&liquid);
+
+	//draw particles
 	SDL_SetRenderDrawColor(renderer,0x00,0xFF,0x00,SDL_ALPHA_OPAQUE);
 	//draw circle with render lines
 	{
@@ -122,12 +137,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 		}
 	}
 
-
 	/* put the newly-cleared rendering on the screen. */
 	SDL_RenderPresent(renderer);
 
 	return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
+
+
 
 /* This function runs once at shutdown. */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
