@@ -19,4 +19,8 @@ Ideas
 //  - multiple stages. spikey balls. multiple balls, a shield paddle. a ball with mass 
 //  - a spikey ball sticks to walls, 
 //  - if it sticks and doesnt move, a new ball comes down. 
-//  - a new ball comes out, it shoots out in a random direction
+//  - a new ball comes out, it shoots out in a random direction  
+
+---
+taking some physics ideas from pikuma physics class
+https://pikuma.com/
