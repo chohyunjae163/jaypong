@@ -2,6 +2,7 @@
 #define FORCE_H
 
 #include "./Vec2.c"
+#include "./Particle.c"
 
 Vector2 GenerateDragForce(Particle particle, float k) {
 	Vector2 drag_force = { .x = 0, .y = 0 };
@@ -19,8 +20,9 @@ Vector2 GenerateDragForce(Particle particle, float k) {
 	return drag_force;
 }
 
-Vector2 GenerateSpringForce(const Particle& a, const Particle& b, float restLength, float k) {
-	Vector2 d = a.position - b.position;
+Vector2 GenerateSpringForce(const Particle a, const Particle b, float restLength, float k) {
+	
+	Vector2 d = Vec2_Sub(a.position, b.position);
 
 	float displacement = Vec2_Magnitude(d) - restLength;
 
@@ -28,7 +30,7 @@ Vector2 GenerateSpringForce(const Particle& a, const Particle& b, float restLeng
 
 	float spring_mag = -k * displacement;
 
-	Vector2 spring_force = spring_dir * spring_mag;
+	Vector2 spring_force = Vec2_Scale(spring_dir, spring_mag);
 	return spring_force;
 }
 
