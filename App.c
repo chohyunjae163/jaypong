@@ -23,7 +23,7 @@ static Vector2 input_force = { .x = 0, .y = 0 };
 //todo: create a fluid
 static SDL_FRect liquid;
 
-#define NUM_PARTICLE 10
+#define NUM_PARTICLE 1
 
 Particle particles[NUM_PARTICLE];
 
@@ -45,11 +45,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 		particles[0].position.x = 250.0;
 		particles[0].position.y = 50.0;
 		particles[0].mass = 1.0f;
-
-		liquid.x = 0;
-		liquid.y = WINDOW_SIZE / 2;
-		liquid.w = WINDOW_SIZE;
-		liquid.h = WINDOW_SIZE / 2;
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
@@ -107,9 +102,26 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	Particle_Integrate(&particles[0], force, delta_time);
 
 
-	//TODO:
 	//check the particle position, and keep the particle inside the boundaries of the window
-	
+	const float bounce_impulse_scale = -0.9f;
+	for (int i = 0; i < NUM_PARTICLE; ++i) {
+		if (particles[i].position.y >= WINDOW_SIZE) {
+			particles[i].position.y -= PARTICLE_RADIUS;
+			particles[i].velocity.y *= bounce_impulse_scale;
+		}
+		if (particles[i].position.x >= WINDOW_SIZE) {
+			particles[i].position.x -= PARTICLE_RADIUS;
+			particles[i].velocity.x *= bounce_impulse_scale;
+		}
+		if (particles[i].position.x <= 0) {
+			particles[i].position.x += PARTICLE_RADIUS;
+			particles[i].velocity.x *= bounce_impulse_scale;
+		}
+		if (particles[i].position.y <= 0) {
+			particles[i].position.y += PARTICLE_RADIUS;
+			particles[i].velocity.y *= bounce_impulse_scale;
+		}
+	}
 
 	//update prev_ticks
 	prev_ticks = current_ticks; 
@@ -117,10 +129,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	/* clear the window to the draw color. */
 	SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
-
-	//draw liquid
-	SDL_SetRenderDrawColor(renderer,0x00,0x00,0xFF,SDL_ALPHA_OPAQUE);
-	SDL_RenderFillRect(renderer,&liquid);
 
 	//draw particles
 	SDL_SetRenderDrawColor(renderer,0x00,0xFF,0x00,SDL_ALPHA_OPAQUE);
@@ -142,8 +150,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
-
-
 
 /* This function runs once at shutdown. */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
